@@ -13,7 +13,7 @@ export class Post extends Model{
     @Column(DataType.TEXT)
     body:string;
 
-    @HasMany(()=>Media)
+    @HasMany(()=>Media,'mediaId')
     media:Media[];
 
     @BelongsTo(()=>Post, {foreignKey:'thread_id',as:'Thread'})
@@ -22,12 +22,10 @@ export class Post extends Model{
     @HasMany(()=>Post,{foreignKey:'thread_id',as:'Responses'})
     responses:Post[]
 
-    @AllowNull(false)
-    @BelongsTo(()=>Board)
+    @BelongsTo(()=>Board,'boardId')
     board:Board
 
-    @BelongsTo(()=>User)
-    @AllowNull(true)
+    @BelongsTo(()=>User,'authorId')
     author?:User
 
     @Column(DataType.DATE)

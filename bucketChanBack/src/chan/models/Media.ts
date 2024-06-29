@@ -12,7 +12,7 @@ export class Media extends Model{
     @Column(DataType.TEXT)
     hash:string;
 
-    @BelongsTo(()=>Post)
+    @BelongsTo(()=>Post,'mediaId')
     post:Post
 
 

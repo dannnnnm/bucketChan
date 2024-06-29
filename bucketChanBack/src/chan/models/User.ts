@@ -1,6 +1,7 @@
 import { AllowNull, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import { Post } from "./imageboard/Post.js";
 import { Message } from "./chat/Message.js";
+import { Board } from "./imageboard/Board.js";
 
 @Table({underscored:true,tableName: "page_user"})
 export class User extends Model{
@@ -29,11 +30,14 @@ export class User extends Model{
     @Column(DataType.BOOLEAN)
     isLocked:boolean;
 
-    @HasMany(()=>Post)
+    @HasMany(()=>Post,'authorId')
     posts:Post[]
 
-    @HasMany(()=>Message)
+    @HasMany(()=>Message,'authorId')
     messages:Message[]
+
+    @HasMany(()=>Board,'creatorId')
+    createdBoards:Board[]
  
 
 

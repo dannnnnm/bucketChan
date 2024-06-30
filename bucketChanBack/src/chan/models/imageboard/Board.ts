@@ -1,11 +1,11 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, HasMany, HasOne, Index, Model, Table, Unique } from "sequelize-typescript";
 import { User } from "../User.js";
 import { Post } from "./Post.js";
 import { ChatRoom } from "../chat/ChatRoom.js";
 
-@Table({underscored:true,tableName: "board"})
+@Table({underscored:true,tableName: "board",indexes:[{fields:[{name:"short_name",collate:"NOCASE"}]}]})
 export class Board extends Model{
-    @AllowNull(true)
+    @AllowNull(false)
     @Column(DataType.TEXT)
     shortName:string;
 
@@ -19,7 +19,7 @@ export class Board extends Model{
     @BelongsTo(()=>User,'creatorId')
     creator?:User
 
-    @BelongsTo(()=>ChatRoom,'chatRoomId')
+    @HasOne(()=>ChatRoom,'chatRoomId')
     chatRoom:ChatRoom
 
 

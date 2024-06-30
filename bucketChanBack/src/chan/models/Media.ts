@@ -1,8 +1,8 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, HasMany, Index, Model, Table } from "sequelize-typescript";
 import { User } from "./User.js";
 import { Post } from "./imageboard/Post.js";
 
-@Table({underscored:true,tableName: "media"})
+@Table({underscored:true,tableName: "media",indexes:[{fields:[{name:"hash",collate:"NOCASE"}]}]})
 export class Media extends Model{
     @AllowNull(true)
     @Column(DataType.TEXT)

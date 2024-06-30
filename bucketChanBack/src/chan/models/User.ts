@@ -1,9 +1,9 @@
-import { AllowNull, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { AllowNull, Column, DataType, HasMany, Index, Model, Table } from "sequelize-typescript";
 import { Post } from "./imageboard/Post.js";
 import { Message } from "./chat/Message.js";
 import { Board } from "./imageboard/Board.js";
 
-@Table({underscored:true,tableName: "page_user"})
+@Table({underscored:true,tableName: "page_user",indexes:[{fields:[{name:"username",collate:"NOCASE"}]}]})
 export class User extends Model{
     @AllowNull(false)
     @Column(DataType.TEXT)

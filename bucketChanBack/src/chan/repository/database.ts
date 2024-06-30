@@ -14,22 +14,23 @@ import { Message } from "../models/chat/Message.js";
 export class DatabaseConnection{
     private static connection=new Sequelize({
         dialect: "sqlite",
-        storage:'bucketChan.sqlite'
+        storage:'bucketChan.sqlite',
     });
     private static connectionOpen:boolean=false;
-    public static getConnection():Sequelize{
+    public static async getConnection():Promise<Sequelize>{
         if (!this.connectionOpen){
             this.connectionOpen=true
             console.log("env from connection",process.env.POSTGRES_USER)
-            this.connection.authenticate().then(()=>{
-                this.connection.addModels([User,Board,Post,Media,ChatRoom,Message])
-                this.connection.sync()
-                return this.connection
-            }).catch((reason)=>{
+            await this.connection.authenticate()
+            this.connection.addModels([User,Board,Post,Media,ChatRoom,Message])
+            await this.connection.sync()
+            await this.connection.query("PRAGMA foreign_keys = ON");
+            return this.connection
+            /*}).catch((reason)=>{
                 console.error(`Failed to open connection to database with "${reason}"`)
                 this.connectionOpen=false
                 return null
-            })
+            })*/
         }
         else{
             return this.connection

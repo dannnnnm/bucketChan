@@ -1,4 +1,4 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, HasOne, Index, Model, Table, Unique } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Index, Model, Table, Unique } from "sequelize-typescript";
 import { User } from "../User.js";
 import { Post } from "./Post.js";
 import { ChatRoom } from "../chat/ChatRoom.js";
@@ -16,10 +16,11 @@ export class Board extends Model{
     @HasMany(()=>Post,'boardId')
     threads:Post[]
 
-    @BelongsTo(()=>User,'creatorId')
-    creator?:User
+    @ForeignKey(() => User)
+    @Column(DataType.NUMBER)
+    creatorId?:number
 
-    @HasOne(()=>ChatRoom,'chatRoomId')
+    @HasOne(()=>ChatRoom,'boardId')
     chatRoom:ChatRoom
 
 

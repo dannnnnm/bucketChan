@@ -1,6 +1,5 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { User } from "../User.js";
-import { Post } from "../imageboard/Post.js";
 import { ChatRoom } from "./ChatRoom.js";
 
 @Table({underscored:true,tableName: "message"})
@@ -10,10 +9,12 @@ export class Message extends Model{
     content:string;
 
     
-    @BelongsTo(()=>ChatRoom,'chatRoomId')
-    chatRoom:ChatRoom
+    @ForeignKey(() => ChatRoom)
+    @Column(DataType.NUMBER)
+    chatRoomId:number
 
-    @BelongsTo(()=>User,'authorId')
-    author:User
+    @ForeignKey(() => User)
+    @Column(DataType.NUMBER)
+    authorId:number
 
 }

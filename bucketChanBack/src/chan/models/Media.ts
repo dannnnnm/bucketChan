@@ -1,4 +1,4 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, Index, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, ForeignKey, HasMany, Index, Model, Table } from "sequelize-typescript";
 import { User } from "./User.js";
 import { Post } from "./imageboard/Post.js";
 
@@ -12,8 +12,13 @@ export class Media extends Model{
     @Column(DataType.TEXT)
     hash:string;
 
-    @BelongsTo(()=>Post,'mediaId')
-    post:Post
+    @AllowNull(false)
+    @Column(DataType.TEXT)
+    mimeType:string;
+
+    @ForeignKey(() => Post)
+    @Column(DataType.NUMBER)
+    postId:number
 
 
 

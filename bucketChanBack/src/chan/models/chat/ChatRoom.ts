@@ -1,4 +1,4 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, HasOne, Index, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Index, Model, Table } from "sequelize-typescript";
 import { User } from "../User.js";
 import { Post } from "../imageboard/Post.js";
 import { Board } from "../imageboard/Board.js";
@@ -14,14 +14,11 @@ export class ChatRoom extends Model{
     @Column(DataType.TEXT)
     name:string;
 
-    @HasMany(()=>Message,'chatRoomId')
+    @HasMany(()=>Message)
     messages:Message[]
 
-    @BelongsTo(()=>Board,'chatRoomId')
-    board:Board
-
-    
-
-
+    @ForeignKey(() =>Board)
+    @Column(DataType.NUMBER)
+    boardId:number
 
 }

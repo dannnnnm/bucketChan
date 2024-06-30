@@ -1,7 +1,8 @@
-import { AllowNull, BelongsTo, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, Default, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { User } from "../User.js";
 import { Board } from "./Board.js";
 import { Media } from "../Media.js";
+import { Sequelize } from "sequelize";
 
 @Table({underscored:true,tableName: "post"})
 export class Post extends Model{
@@ -16,24 +17,30 @@ export class Post extends Model{
     @HasMany(()=>Media,'mediaId')
     media:Media[];
 
-    @BelongsTo(()=>Post, {foreignKey:'thread_id',as:'Thread'})
-    thread?:Post
+    @ForeignKey(() => Post)
+    @Column(DataType.NUMBER)
+    threadId?:number
 
     @HasMany(()=>Post,{foreignKey:'thread_id',as:'Responses'})
     responses:Post[]
 
-    @BelongsTo(()=>Board,'boardId')
-    board:Board
+    @ForeignKey(() => Board)
+    @Column(DataType.NUMBER)
+    boardId:number
 
-    @BelongsTo(()=>User,'authorId')
-    author?:User
+    @ForeignKey(() => User)
+    @Column(DataType.NUMBER)
+    authorId?:number
 
+    @Default(Sequelize.literal("CURRENT_TIMESTAMP"))
     @Column(DataType.DATE)
     bumpedAt:Date;
 
+    @Default(true)
     @Column(DataType.BOOLEAN)
     active:boolean
 
+    @Default(false)
     @Column(DataType.BOOLEAN)
     encrypted:boolean
 
@@ -42,7 +49,7 @@ export class Post extends Model{
     encryptedMessage?:string
 
     public isResponse():boolean{
-        return this.thread!=null;
+        return this.threadId!=0;
     }
 
     

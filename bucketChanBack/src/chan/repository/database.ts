@@ -38,3 +38,5 @@ export class DatabaseConnection{
     }
 
 }
+
+export const dbConnection=await DatabaseConnection.getConnection()

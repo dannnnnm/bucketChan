@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validate } from "../../middleware/validation.js";
-import { boardCreationValidator, setupBoard } from "./boardRoutes/boardRoutes.js";
+import { boardCreationValidator, createThread as createThread, postImagesUpload, setupBoard, threadCreationValidator } from "./boardRoutes/boardRoutes.js";
 import { Board } from "../models/imageboard/Board.js";
 import { User } from "../models/User.js";
 import { ChatRoom } from "../models/chat/ChatRoom.js";
@@ -32,7 +32,7 @@ boardRouter.post("/new",validate(boardCreationValidator),async (req,res)=>{
 
 boardRouter.get("/:shortName",async (req,res)=>{
     let requestedShortName=req.params.shortName;
-    if (!requestedShortName) return res.status(400).send({error:"No board letter requested"});
+    if (!requestedShortName) return res.status(404).send({error:"No board letter requested"});
     let foundBoard = await Board.findOne({
         where: { shortName: requestedShortName },
         include: [
@@ -41,4 +41,14 @@ boardRouter.get("/:shortName",async (req,res)=>{
     });
 
     return res.send(foundBoard);
+})
+
+
+boardRouter.post("/:shortName/newThread",postImagesUpload,validate(threadCreationValidator,"newThread"),async (req,res)=>{
+    let boardShortName=req.params.boardShortName;
+    let board=await Board.findOne({where:{shortName:boardShortName}});
+    if (!board) return res.status(404).send({error:"board not found"});
+    let postJson=req.body;
+    let result=await createThread(postJson,board.id)
+    
 })

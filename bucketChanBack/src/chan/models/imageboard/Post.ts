@@ -21,7 +21,7 @@ export class Post extends Model{
     @Column(DataType.NUMBER)
     threadId?:number
 
-    @HasMany(()=>Post,{foreignKey:'thread_id',as:'Responses'})
+    @HasMany(()=>Post,{foreignKey:'thread_id'})
     responses:Post[]
 
     @ForeignKey(() => Board)
@@ -49,7 +49,7 @@ export class Post extends Model{
     encryptedMessage?:string
 
     public isResponse():boolean{
-        return this.threadId!=0;
+        return this.threadId!=null;
     }
 
     

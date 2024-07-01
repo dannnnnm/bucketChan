@@ -8,9 +8,16 @@ import { error } from "console";
 import { Post } from "../models/imageboard/Post.js";
 import { Media } from "../models/Media.js";
 import { where } from "sequelize";
+import { r9kAllow } from "../r9k/r9kChecker.js";
 
 
 export const boardRouter=Router()
+
+boardRouter.get("/boards",async (req,res)=>{
+    let boards=await Board.findAll({order:['createdAt','DESC']});
+    return res.send(boards);
+
+})
 
 boardRouter.post("/new",validate(boardCreationValidator),async (req,res)=>{
     let json=req.body;
@@ -71,7 +78,8 @@ boardRouter.post("/:shortName/:threadId/answer",postImagesUpload,validate(respon
     if (!board) return res.status(404).send("board not found");
     let thread=await Post.findOne({where:{id:postId,threadId:null,boardId:board.id}});
     if (!thread) return res.status(404).send("thread not found");
-
+    if (!thread.active) return res.status(403).send("cannot interact with deleted thread");
+    if (board.isR9k && !r9kAllow(board.threads,responseJson)) return res.status(406).send("repeated post in r9k-style board!")
     let result=await createResponse(responseJson,thread,req.body.sage);
 
     if (result.ok){

@@ -83,7 +83,7 @@ export var responsePostValidator=Joi.object({
 })
 
 export var responseCreationValidator=Joi.object({
-    post: responseCreationValidator,
+    post: responsePostValidator,
     sage: Joi.string()
 })
 

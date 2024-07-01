@@ -16,7 +16,7 @@ export class Board extends Model{
     @Default(false)
     @AllowNull(false)
     @Column(DataType.BOOLEAN)
-    isr9k:boolean
+    isR9k:boolean
 
     @HasMany(()=>Post,'boardId')
     threads:Post[]

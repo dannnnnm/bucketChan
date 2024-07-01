@@ -32,7 +32,7 @@ export class Post extends Model{
     @Column(DataType.NUMBER)
     authorId?:number
 
-    @Default(Sequelize.literal("CURRENT_TIMESTAMP"))
+    @Default(new Date())
     @Column(DataType.DATE)
     bumpedAt:Date;
 
@@ -50,6 +50,10 @@ export class Post extends Model{
 
     public isResponse():boolean{
         return this.threadId!=null;
+    }
+
+    public bump(){
+        this.bumpedAt=new Date()
     }
 
     

@@ -37,7 +37,7 @@ describe('Test /board/newThread',()=>{
         let postJson={
             title:faker.science.chemicalElement().name,
             body:faker.hacker.phrase(),
-            media:[]
+            media:[{filename:"a.png",hash:"wetjoiwertjwo",mimeType:"type/png"}]
         }
         let result=await postRepository.create({...postJson,boardId:board.id});
         console.log(`saved post json ${JSON.stringify(result)}`)

@@ -7,9 +7,14 @@ import multer from "multer"
 import path from "path";
 import { Post } from "../../models/imageboard/Post.js";
 import { dbConnection } from "../../repository/database.js";
+import { createHash } from "crypto";
+import { mkdirSync, openSync, readFileSync, renameSync } from "fs";
+import { Media } from "../../models/Media.js";
 
+
+const imageStoragePath=path.join("uploaded","multimedia");
 var imageStorage=multer.diskStorage({
-    destination: path.join("uploaded","multimedia"),
+    destination: imageStoragePath,
     filename: function(req,file,cb){
         cb(null,file.originalname);
     }
@@ -63,10 +68,23 @@ export var postMediaValidator=Joi.object({
 
 export var threadCreationValidator=Joi.object({
     boardShortName: Joi.number().min(1).required(),
-    title: Joi.string().required(),
+    title: Joi.string(),
     body: Joi.string().required(),
     media: Joi.array().min(0).items(postMediaValidator).required(),
     authorId: Joi.number().min(1)
+})
+
+export var responsePostValidator=Joi.object({
+    boardShortName: Joi.number().min(1).required(),
+    title: Joi.string(),
+    body: Joi.string().required(),
+    media: Joi.array().min(0).items(postMediaValidator).required(),
+    authorId: Joi.number().min(1),
+})
+
+export var responseCreationValidator=Joi.object({
+    post: responseCreationValidator,
+    sage: Joi.string()
 })
 
 export async function setupBoard(creatorUserId,shortName,name):Promise<{ok:boolean,savedBoard:any,error:any}>{
@@ -83,7 +101,7 @@ export async function setupBoard(creatorUserId,shortName,name):Promise<{ok:boole
         let chatRoom = new ChatRoom({
             shortName,
             name,
-            board: savedBoard
+            boardId: savedBoard.id
         })
         await chatRoom.save({ transaction })
         await transaction.commit();
@@ -102,11 +120,61 @@ export async function createThread(postJson,boardId):Promise<{ok:boolean,savedPo
             ...postJson,
             boardId
         });
-        let savedPost=newPost.save();
+        let savedPost=await newPost.save();
+        await saveMedia(newPost,savedPost.id);
         return {ok:true,savedPost,error:null}
     }
     catch(error){
         return {ok:false,savedPost:null,error};
+    }
+}
+
+export async function createResponse(postJson,thread:Post,sage:boolean):Promise<{ok:boolean,savedPost:any,error:any}>{
+    try{
+        let newPost=new Post({
+            ...postJson,
+            boardId: thread.boardId,
+            threadId: thread.id
+        });
+        let savedPost=await newPost.save();
+        await saveMedia(newPost,savedPost.id);
+        if (thread.active && thread.responses.length+1<=150 && !sage){
+            thread.bump()
+            await thread.save()
+        }
+        else if (thread.active && thread.responses.length+1>150){
+            thread.active=false;
+            await thread.save();
+        }
+        return {ok:true,savedPost,error:null}
+    }
+    catch(error){
+        return {ok:false,savedPost:null,error};
+    }
+}
+
+async function saveMedia(post:Post,postId:number){
+    for (let index = 0; index < post.media.length; index++) {
+        const mediaFile = post.media[index]; 
+        let hasher=createHash('sha256');
+        let filePath=path.join(imageStoragePath,mediaFile.filename);
+        let bytes=readFileSync(filePath);
+        let imgHash=hasher.update(bytes).digest('hex');
+        try{
+            mediaFile.hash=imgHash;
+            mkdirSync(path.join(imageStoragePath,`${imgHash}`))
+            let newPath=path.join(imageStoragePath,`${imgHash}`,mediaFile.filename);
+            renameSync(filePath,newPath);
+            let fileToSave=new Media({
+                ...mediaFile,
+                postId
+            });
+            await fileToSave.save();  
+        }
+        catch(error){
+            console.log(error)
+        }
+        
     }
 }
 

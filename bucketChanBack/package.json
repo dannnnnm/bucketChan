@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "ftest":"npm ./dist/test/boardRoutes.spec.js",
+    "ftest": "npm ./dist/test/boardRoutes.spec.js",
     "build": "tsc",
     "exec": "npm ./dist/index.js",
     "qtest": "npm run build & tsx watch src/index.ts"
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "@types/chai": "^4.3.16",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.14.9",
@@ -27,6 +28,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "joi": "^17.13.3",
     "multer": "^1.4.5-lts.1",

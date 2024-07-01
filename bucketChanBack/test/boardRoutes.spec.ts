@@ -48,7 +48,7 @@ describe('Test /board/newThread',()=>{
 
 
 describe('Test /board/response',()=>{
-    it("thread should be created in board and with appropiate data",async ()=>{
+    it("response should be created in board and with appropiate data",async ()=>{
         let thread=await postRepository.findOne({where:{threadId:null}});
         let postJson={
             title:faker.science.chemicalElement().name,

@@ -24,6 +24,7 @@ await testConnection.sync({force:true})
 await testConnection.query("PRAGMA foreign_keys = ON");
 var boardRepository=await testConnection.getRepository(Board)
 var postRepository=await testConnection.getRepository(Post)
+var mediaRepository=await testConnection.getRepository(Media);
 describe('Test /newBoard',()=>{
     it("new 'admin' board should be created",async ()=>{
         let result=await boardRepository.create({shortName:"k",name:"militarie"})
@@ -39,7 +40,7 @@ describe('Test /board/newThread',()=>{
             body:faker.hacker.phrase(),
             media:[{filename:"a.png",hash:"wetjoiwertjwo",mimeType:"type/png"}]
         }
-        let result=await postRepository.create({...postJson,boardId:board.id});
+        let result=await postRepository.create({...postJson,boardId:board.id},{include:mediaRepository});
         console.log(`saved post json ${JSON.stringify(result)}`)
         assert.notEqual(result,null)
     })

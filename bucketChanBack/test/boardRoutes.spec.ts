@@ -40,6 +40,45 @@ describe('Test /board/newThread',()=>{
             media:[]
         }
         let result=await postRepository.create({...postJson,boardId:board.id});
+        console.log(`saved post json ${JSON.stringify(result)}`)
         assert.notEqual(result,null)
+    })
+})
+
+
+describe('Test /board/response',()=>{
+    it("thread should be created in board and with appropiate data",async ()=>{
+        let thread=await postRepository.findOne({where:{threadId:null}});
+        let postJson={
+            title:faker.science.chemicalElement().name,
+            body:faker.hacker.phrase(),
+            media:[],
+            threadId:thread.id
+        }
+        let result=await postRepository.create({...postJson,boardId:thread.boardId});
+        
+        let recoveredPost=await postRepository.findOne({where:{threadId:null},include:[
+            postRepository,
+        ]});
+        console.log(`saved post json ${JSON.stringify(recoveredPost)}`)
+        assert.isTrue(recoveredPost.responses.length!=0)
+    })
+})
+
+
+describe('Test bumping active',()=>{
+    it("thread should be created in board and with appropiate data",async ()=>{
+        let thread=await postRepository.findOne({where:{threadId:null}});
+        let oldDate=thread.bumpedAt;
+        let sleep=new Promise<number>((resolve,reject)=>{
+            setTimeout(()=>{
+                resolve(1)
+            },2000)
+        });
+        await sleep;
+        thread.bump()
+        await thread.save()
+        let newThread=await postRepository.findOne({where:{threadId:null}});
+        assert.notDeepEqual(oldDate,newThread.bumpedAt);
     })
 })

@@ -87,7 +87,7 @@ export var responseCreationValidator=Joi.object({
     sage: Joi.string()
 })
 
-export async function setupBoard(creatorUserId,shortName,name):Promise<{ok:boolean,savedBoard:any,error:any}>{
+export async function setupBoard(creatorUserId,shortName,name,isR9k=false):Promise<{ok:boolean,savedBoard:any,error:any}>{
     let transaction=await dbConnection.transaction();
     try {
         let creator = await User.findByPk(creatorUserId);
@@ -95,7 +95,8 @@ export async function setupBoard(creatorUserId,shortName,name):Promise<{ok:boole
         let board = new Board({
             shortName,
             name,
-            creatorId
+            creatorId,
+            isR9k
         })
         let savedBoard = await board.save({ transaction })
         let chatRoom = new ChatRoom({

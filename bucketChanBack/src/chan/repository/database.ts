@@ -5,6 +5,7 @@ import { Board } from "../models/imageboard/Board.js";
 import { Media } from "../models/Media.js";
 import { ChatRoom } from "../models/chat/ChatRoom.js";
 import { Message } from "../models/chat/Message.js";
+import { setupBoard } from "../controllers/boardRoutes/boardRoutes.js";
 
 
 
@@ -39,4 +40,18 @@ export class DatabaseConnection{
 
 }
 
+async function setupBasicBoards(){
+    console.log("setting up basic boards")
+    await setupBoard(null,"k","military")
+    await setupBoard(null,'g','technology')
+    await setupBoard(null,'r9k','robot 9000',true)
+    await setupBoard(null,'v','videogames')
+    await setupBoard(null,'int','international')
+    await setupBoard(null,'m','mecha')
+    await setupBoard(null,'tv','dr. disrespect')
+    await setupBoard(null,'bant','international random')
+    await setupBoard(null,'diy','do it yourself')
+}
+
 export const dbConnection=await DatabaseConnection.getConnection()
+if ((await Board.findAll()).length==0) await setupBasicBoards();

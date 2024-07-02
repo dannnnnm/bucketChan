@@ -9,6 +9,11 @@ const router = createRouter({
       name: 'home',
       component: HomePage
     },
+    {
+      path: '/badChat/:room?',
+      name: 'badchat',
+      component: ()=>import ("../views/ChatBad.vue")
+    },
     
   ]
 })

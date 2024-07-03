@@ -15,7 +15,8 @@ import App from './App.vue'
 import router from './router'
 
 
-export const clientSock=io("http://localhost:3000")
+export const clientSock=io(`http://${window.location.hostname}:3000`)
+console.log(window.location.hostname)
 
 const app = createApp(App)
 const vuetify = createVuetify({

@@ -8,6 +8,7 @@ const port=3000;
 
 const app=express()
 const server=createServer(app)
+app.set('trust proxy', true)
 
 app.use(cors())
 

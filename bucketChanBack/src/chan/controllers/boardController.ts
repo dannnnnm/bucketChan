@@ -90,3 +90,7 @@ boardRouter.post("/:shortName/:threadId/answer",postImagesUpload,validate(respon
     }
 
 })
+
+boardRouter.post("/:shortname/:threadId/encryptedAnswer",(req,res)=>{
+    
+})

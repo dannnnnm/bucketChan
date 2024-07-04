@@ -13,6 +13,8 @@ export function r9kAllow(boardThreads:Post[],newPost:Post):boolean{
             result=false;
             break;
         }
+        if (!existingPost.responses) continue;
+        console.log("responses")
         existingPost.responses.forEach((response)=>{
             if (response.encrypted || result==false) return;
             const modifiedExistingPostContent=response.body.trim().toLowerCase().replace(r9kStripRegex,"");

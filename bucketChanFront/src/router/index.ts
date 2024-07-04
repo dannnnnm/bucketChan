@@ -12,9 +12,8 @@ const router = createRouter({
     {
       path: '/badChat/:room?',
       name: 'badchat',
-      component: ()=>import ("../views/ChatBad.vue")
-    },
-    
+      component: () => import('../views/ChatBad.vue')
+    }
   ]
 })
 

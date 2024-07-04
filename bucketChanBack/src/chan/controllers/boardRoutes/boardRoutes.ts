@@ -67,7 +67,7 @@ export var postMediaValidator=Joi.object({
 })
 
 export var threadCreationValidator=Joi.object({
-    boardShortName: Joi.number().min(1).required(),
+    boardShortName: Joi.string().min(1).max(6).required(),
     title: Joi.string(),
     body: Joi.string().required(),
     media: Joi.array().min(0).items(postMediaValidator).required(),

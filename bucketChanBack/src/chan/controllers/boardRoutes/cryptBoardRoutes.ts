@@ -50,11 +50,10 @@ function checkFileTypeForAge(req,file,cb){
 export var encryptedResponseCreationValidator=Joi.object({
     authorId:Joi.number().min(0).required(),
     fileHash: Joi.string().required(),
-    filename: Joi.string().required()
-
+    filename: Joi.string().required(),
 })
 
-export async function createEncryptedResponse(json,thread:Post,sage:boolean){
+export async function createEncryptedResponse(json,thread:Post,sage:boolean):Promise<{ok:boolean,savedPost:any,error:any}>{
     try{
         let newPost=new Post({
             authorId:json.authorId,

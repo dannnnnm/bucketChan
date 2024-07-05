@@ -17,6 +17,8 @@ app.use(json())
 
 app.use("/board",boardRouter);
 
+app.use(express.static("uploaded/multimedia"))
+
 app.get("/hello",(req,res)=>{
     res.send("hell");
 })
@@ -26,3 +28,4 @@ initSocket(server);
 server.listen(port,"0.0.0.0",()=>{
     console.log("up and running")
 })
+

@@ -14,7 +14,7 @@ export class Post extends Model{
     @Column(DataType.TEXT)
     body:string;
 
-    @HasMany(()=>Media,'mediaId')
+    @HasMany(()=>Media,'postId')
     media:Media[];
 
     @ForeignKey(() => Post)

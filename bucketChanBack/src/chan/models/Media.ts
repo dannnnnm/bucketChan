@@ -12,7 +12,7 @@ export class Media extends Model{
     @Column(DataType.TEXT)
     hash:string;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column(DataType.TEXT)
     mimeType:string;
 

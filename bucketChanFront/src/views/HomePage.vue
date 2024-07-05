@@ -4,6 +4,7 @@ import axios from 'axios';
 
 <template>
   <v-container fluid class="gradient-bg">
+    <h1 class="text-h1 text-center font-weight-bold">BucketChan</h1>
     <v-row class="mt-5 about-us about-title side-margin">
       <p class="text-h5 font-weight-bold">Who are we?</p>
     </v-row>

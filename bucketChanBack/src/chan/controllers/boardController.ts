@@ -73,9 +73,9 @@ boardRouter.post("/:shortName/newThread",postImagesUpload,validate(threadCreatio
     let board=await Board.findOne({where:{shortName:boardShortName},include:[Post]});
     if (!board) return res.status(404).send({error:"board not found"});
     let postJson=JSON.parse(req.body.newThread);
+    if (board.isR9k && !r9kAllow(board.threads,postJson)) return res.status(406).send("repeated post in r9k-style board!")
     let result=await createThread(postJson,board.id)
     console.log("result ",JSON.stringify(result))
-    if (board.isR9k && !r9kAllow(board.threads,postJson)) return res.status(406).send("repeated post in r9k-style board!")
     if (result.ok){
         return res.send(result.savedPost);
     }

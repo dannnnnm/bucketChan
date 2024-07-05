@@ -16,7 +16,7 @@ const router = createRouter({
     },
     {
       path: '/board/:shortName',
-      name: 'badchat',
+      name: 'board',
       component: ()=>import ("../views/Board.vue")
     },
     

@@ -25,13 +25,17 @@ import axios from 'axios';
     </v-row>
 
     <v-row class="mt-10 about-us side-margin about-title">
-      <p class="text-h5 font-weight-bold">Latest threads</p>
+      <p class="text-h5 font-weight-bold">Chats</p>
     </v-row>
-    <v-row class="about-us about-us side-margin">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem atque vel numquam in
-      fugiat animi minima voluptates ipsa explicabo, repellat nostrum dolore cum necessitatibus odio
-      eum ducimus labore alias. Odio.
+
+    <v-row class="about-us side-margin">
+      <v-row v-for="row in totalRows">
+        <v-col cols="12" :sm="3" v-for="board in getRow(row)">
+          <a :href="'/badChat/' + board.shortName">/{{ board.shortName }}/ - {{ board.name }}</a>
+        </v-col>
+      </v-row>
     </v-row>
+
   </v-container>
 </template>
 

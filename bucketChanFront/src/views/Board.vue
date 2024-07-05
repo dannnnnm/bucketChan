@@ -173,7 +173,12 @@ export default {
 
                     //"Access-Control-Allow-Origin": "*",
                 },
-            }).then((response) => location.reload()).catch((error) => console.error(error))
+            }).then((response) => location.reload()).catch((error) => {
+                console.error(error)
+                if (error.response.status == 406) {
+                    alert("Post repetido en r9k!")
+                }
+            })
 
         },
         getMedia(media: { filename: string, hash: string }): string {

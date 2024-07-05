@@ -138,7 +138,12 @@ export default {
                 },
             }).then((response) => {
                 location.reload()
-            }).catch((error) => console.error(error))
+            }).catch((error) => {
+                console.error(error)
+                if (error.response.status == 406) {
+                    alert("Post repetido en r9k!")
+                }
+            })
 
         },
     }

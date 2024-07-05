@@ -15,7 +15,7 @@ import { createEncryptedResponse } from "./boardRoutes/cryptBoardRoutes.js";
 export const boardRouter=Router()
 
 boardRouter.get("/boards",async (req,res)=>{
-    let boards=await Board.findAll({order:['createdAt','DESC']});
+    let boards=await Board.findAll({order:[['created_at','DESC']]});
     return res.send(boards);
 
 })
@@ -42,14 +42,18 @@ boardRouter.post("/new",validate(boardCreationValidator),async (req,res)=>{
 boardRouter.get("/:shortName",async (req,res)=>{
     let requestedShortName=req.params.shortName;
     if (!requestedShortName) return res.status(404).send({error:"No board letter requested"});
+    console.log("reqst ",requestedShortName )
     let foundBoard = await Board.findOne({
         where: { shortName: requestedShortName },
         include: [
             { model: ChatRoom },
             //kill me.
-            { model: Post, include: [Media,{model: Post,include:[Media],order:[[{model:Post,as:'responses'},'bumped_at','ASC']]}], where:{ threadId: null} }],
+            { model: Post, include: [Media,{model: Post,include:[Media],order:[[{model:Post,as:'responses'},'bumped_at','ASC']]}], where:{ threadId: null},required:false }],
             order:[[{model:Post,as:'threads'},'bumped_at', 'DESC']]
     });
+    console.log("found board ",foundBoard)
+
+    if (!foundBoard.threads) foundBoard.threads=[];
 
     foundBoard.threads.forEach((thread)=>{
         thread.responses.sort((postA,postB)=>{

@@ -4,15 +4,17 @@ import { clientSock } from '@/main'
 
 <template>
   <v-container fluid>
-    <template v-for="(message, index) in messages">
-      <v-row class="text-red">{{ message.author }}</v-row>
-      <v-row>{{ message.message }}</v-row>
-    </template>
+    <v-form @submit.prevent="sendMessage()">
+      <template v-for="(message, index) in messages">
+        <v-row class="text-red">{{ message.author }}</v-row>
+        <v-row>{{ message.message }}</v-row>
+      </template>
 
-    <v-row>
-      <v-text-field v-model="messageToSend"> </v-text-field>
-      <v-btn @click="sendMessage()">SEND</v-btn>
-    </v-row>
+      <v-row>
+        <v-text-field v-model="messageToSend"> </v-text-field>
+        <v-btn type="submit">SEND</v-btn>
+      </v-row>
+    </v-form>
   </v-container>
 </template>
 

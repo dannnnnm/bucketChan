@@ -57,6 +57,9 @@ boardRouter.get("/:shortName",async (req,res)=>{
 
     foundBoard.threads.forEach((thread)=>{
         thread.responses.sort((postA,postB)=>{
+            if (postA.bumpedAt.getTime()==postB.bumpedAt.getTime()){
+                return  postA.id>postB.id?1:-1
+            }
             return postA.bumpedAt.getTime()>postB.bumpedAt.getTime()?1:-1
         })
     })
@@ -67,11 +70,12 @@ boardRouter.get("/:shortName",async (req,res)=>{
 
 boardRouter.post("/:shortName/newThread",postImagesUpload,validate(threadCreationValidator,"newThread"),async (req,res)=>{
     let boardShortName=req.params.shortName;
-    let board=await Board.findOne({where:{shortName:boardShortName}});
+    let board=await Board.findOne({where:{shortName:boardShortName},include:[Post]});
     if (!board) return res.status(404).send({error:"board not found"});
     let postJson=JSON.parse(req.body.newThread);
     let result=await createThread(postJson,board.id)
     console.log("result ",JSON.stringify(result))
+    if (board.isR9k && !r9kAllow(board.threads,postJson)) return res.status(406).send("repeated post in r9k-style board!")
     if (result.ok){
         return res.send(result.savedPost);
     }
@@ -88,7 +92,7 @@ boardRouter.post("/:shortName/:threadId/answer",postImagesUpload,validate(respon
     if (!shortName) return res.status(400).send("bad short name");
     if (Number.isNaN(postId)) return res.status(400).send("bad post id");
 
-    let board=await Board.findOne({where:{shortName}})
+    let board=await Board.findOne({where:{shortName},include:[Post]})
     if (!board) return res.status(404).send("board not found");
     let thread=await Post.findOne({where:{id:postId,threadId:null,boardId:board.id},include:[Post]});
     if (!thread) return res.status(404).send("thread not found");

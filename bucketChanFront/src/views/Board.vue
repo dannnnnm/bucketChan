@@ -9,22 +9,22 @@ import ResponsePanel from '@/components/ResponsePanel.vue';
         </v-row>
 
         <template v-for="(thread, index) in threads" class="mb-10">
+            <div :id="`p${thread.id}`"></div>
             <v-row align="center" class="ml-5 right-short aqua-bg">
                 <span class="text-h4 pr-5">{{ thread.title }} </span class="text-h4">
-                <ResponsePanel :threadId="thread.id" :shownId="thread.id" :boardShortName="boardDetails.shortName"
-                    :id="`p${thread.id}`" />
+                <ResponsePanel :threadId="thread.id" :shownId="thread.id" :boardShortName="boardDetails.shortName" />
             </v-row>
             <v-row class="ml-5 right-short aqua-bg mb-5">
                 <v-col cols="12" :sm="3">
                     <v-img :src="getMedia(thread.media[0])" alt="" height=auto></v-img>
                 </v-col>
                 <v-col cols="12" :sm="9">
-                    <div v-html="replaceMentionsWithAnchors(thread.body)"></div>
+                    <div style="white-space: pre;" v-html="replaceMentionsWithAnchors(thread.body)"></div>
                 </v-col>
             </v-row>
 
             <v-row class="ml-15 right-short aqua-bg mb-5" v-for="(response, index) in thread.responses">
-
+                <div :id="`p${response.id}`"></div>
 
                 <v-col cols="12" :sm="3">
 
@@ -35,8 +35,8 @@ import ResponsePanel from '@/components/ResponsePanel.vue';
                     :mention="response.id">
                 </ResponsePanel>
 
-                <v-col cols="12" :sm="9" :id="`p${thread.id}`">
-                    <div v-html="replaceMentionsWithAnchors(response.body)"></div>
+                <v-col cols="12" :sm="9">
+                    <div style="white-space: pre;" v-html="replaceMentionsWithAnchors(response.body)"></div>
                 </v-col>
             </v-row>
 
@@ -182,7 +182,9 @@ export default {
             return `http://${window.location.hostname}:3000/${media.hash}/${media.filename}`
         },
         replaceMentionsWithAnchors(text: string): string {
-            return text.replace(/(>>\d+)/g, `<a href="#$1">$1</a>`).replace('href="#>>', 'href="#p')
+            let mentions = text.replace(/(>>\d+)/g, `<a  href="#$1">$1</a>`).replace('href="#>>', 'href="#p');
+            let greentext = mentions.replace(/(^>(?!>).*)/gm, `<span class="text-green">$1</span>`)
+            return greentext
         }
     },
 

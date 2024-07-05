@@ -46,8 +46,16 @@ boardRouter.get("/:shortName",async (req,res)=>{
         where: { shortName: requestedShortName },
         include: [
             { model: ChatRoom },
-            { model: Post, include: [Media] }]
+            //kill me.
+            { model: Post, include: [Media,{model: Post,include:[Media],order:[[{model:Post,as:'responses'},'bumped_at','ASC']]}], where:{ threadId: null} }],
+            order:[[{model:Post,as:'threads'},'bumped_at', 'DESC']]
     });
+
+    foundBoard.threads.forEach((thread)=>{
+        thread.responses.sort((postA,postB)=>{
+            return postA.bumpedAt.getTime()>postB.bumpedAt.getTime()?1:-1
+        })
+    })
 
     return res.send(foundBoard);
 })
@@ -59,6 +67,7 @@ boardRouter.post("/:shortName/newThread",postImagesUpload,validate(threadCreatio
     if (!board) return res.status(404).send({error:"board not found"});
     let postJson=JSON.parse(req.body.newThread);
     let result=await createThread(postJson,board.id)
+    console.log("result ",JSON.stringify(result))
     if (result.ok){
         return res.send(result.savedPost);
     }
@@ -67,21 +76,21 @@ boardRouter.post("/:shortName/newThread",postImagesUpload,validate(threadCreatio
     }
 })
 
-boardRouter.post("/:shortName/:threadId/answer",postImagesUpload,validate(responseCreationValidator),async (req,res)=>{
+boardRouter.post("/:shortName/:threadId/answer",postImagesUpload,validate(responseCreationValidator,"newResponse"),async (req,res)=>{
     let postId=parseInt(req.params.threadId);
     let shortName=req.params.shortName;
 
-    let responseJson=req.body.post;
+    let responseJson=JSON.parse(req.body.newResponse);
     if (!shortName) return res.status(400).send("bad short name");
     if (Number.isNaN(postId)) return res.status(400).send("bad post id");
 
     let board=await Board.findOne({where:{shortName}})
     if (!board) return res.status(404).send("board not found");
-    let thread=await Post.findOne({where:{id:postId,threadId:null,boardId:board.id}});
+    let thread=await Post.findOne({where:{id:postId,threadId:null,boardId:board.id},include:[Post]});
     if (!thread) return res.status(404).send("thread not found");
     if (!thread.active) return res.status(403).send("cannot interact with deleted thread");
     if (board.isR9k && !r9kAllow(board.threads,responseJson)) return res.status(406).send("repeated post in r9k-style board!")
-    let result=await createResponse(responseJson,thread,req.body.sage);
+    let result=await createResponse(responseJson,thread,responseJson.sage);
 
     if (result.ok){
         return res.send(result.savedPost);

@@ -8,7 +8,7 @@ import path from "path";
 import { Post } from "../../models/imageboard/Post.js";
 import { dbConnection } from "../../repository/database.js";
 import { createHash } from "crypto";
-import { mkdirSync, openSync, readFileSync, renameSync } from "fs";
+import { existsSync, mkdirSync, openSync, readFileSync, renameSync } from "fs";
 import { Media } from "../../models/Media.js";
 
 
@@ -38,7 +38,7 @@ function checkFileTypeForImage(req,file,cb){
     if (mimetype&&extensionType){
         try{
             if (req.body && req.body.newThread){
-                let thread=req.body.newThread
+                let thread=JSON.parse(req.body.newThread)
                 let media:any[]=thread.media;
                 let checkedMedia=media.filter(media=>media.filename==file.originalname)[0]
                 checkedMedia.mimeType=mimetype
@@ -63,7 +63,7 @@ export var boardCreationValidator = Joi.object({
 
 export var postMediaValidator=Joi.object({
     filename: Joi.string().required(),
-    mimeType: Joi.string().required()
+    
 })
 
 export var threadCreationValidator=Joi.object({
@@ -79,12 +79,18 @@ export var responsePostValidator=Joi.object({
     title: Joi.string(),
     body: Joi.string().required(),
     media: Joi.array().min(0).items(postMediaValidator).required(),
+    sage: Joi.string(),
     authorId: Joi.number().min(1),
 })
 
 export var responseCreationValidator=Joi.object({
-    post: responsePostValidator,
-    sage: Joi.string()
+    boardShortName: Joi.string().min(1).required(),
+    title: Joi.string().allow(""),
+    body: Joi.string().required(),
+    media: Joi.array().min(0).items(postMediaValidator).required(),
+    sage: Joi.bool().required(),
+    threadId:Joi.number().min(1).required(),
+    authorId: Joi.number().min(1),
 })
 
 export async function setupBoard(creatorUserId,shortName,name,isR9k=false):Promise<{ok:boolean,savedBoard:any,error:any}>{
@@ -122,10 +128,12 @@ export async function createThread(postJson,boardId):Promise<{ok:boolean,savedPo
             boardId
         });
         let savedPost=await newPost.save();
-        await saveMedia(newPost,savedPost.id);
+        console.log("postjson ",postJson.media)
+        await saveMedia(postJson,savedPost.id);
         return {ok:true,savedPost,error:null}
     }
     catch(error){
+        console.error("error ",error)
         return {ok:false,savedPost:null,error};
     }
 }
@@ -138,7 +146,7 @@ export async function createResponse(postJson,thread:Post,sage:boolean):Promise<
             threadId: thread.id
         });
         let savedPost=await newPost.save();
-        await saveMedia(newPost,savedPost.id);
+        await saveMedia(postJson,savedPost.id);
         if (thread.active && thread.responses.length+1<=150 && !sage){
             thread.bump()
             await thread.save()
@@ -150,6 +158,7 @@ export async function createResponse(postJson,thread:Post,sage:boolean):Promise<
         return {ok:true,savedPost,error:null}
     }
     catch(error){
+        console.error("error ",error)
         return {ok:false,savedPost:null,error};
     }
 }
@@ -163,7 +172,10 @@ async function saveMedia(post:Post,postId:number){
         let imgHash=hasher.update(bytes).digest('hex');
         try{
             mediaFile.hash=imgHash;
-            mkdirSync(path.join(imageStoragePath,`${imgHash}`))
+            if (!existsSync(path.join(imageStoragePath,`${imgHash}`)))
+            {
+                mkdirSync(path.join(imageStoragePath,`${imgHash}`),{})
+            }
             let newPath=path.join(imageStoragePath,`${imgHash}`,mediaFile.filename);
             renameSync(filePath,newPath);
             let fileToSave=new Media({

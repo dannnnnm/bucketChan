@@ -31,7 +31,7 @@ export default {
   },
   mounted() {
     let roomToJoin = this.$route.params.room ? this.$route.params.room : 'generalRoom'
-    alert(`will join ${roomToJoin}`)
+    //alert(`will join ${roomToJoin}`)
     clientSock.emit('joinRoom', roomToJoin, this.fakeUserDetails)
     clientSock.on('joinRoom', (message) => {
       this.messages.push(message)

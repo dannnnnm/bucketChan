@@ -1,57 +1,80 @@
 <!-- src/components/ImageUpload.vue -->
 <template>
-    <div class="drop-zone" @dragover.prevent @drop="onDrop">
+    <div class="drop-zone" @dragover.prevent @drop="onDrop" @click="triggerFileInput">
         <p v-if="!imageSrc">Drag & drop an image here, or click to select one</p>
         <img v-if="imageSrc" :src="imageSrc" alt="Uploaded image" class="uploaded-image" />
-        <input type="file" accept="image/*" @change="onFileChange" ref="fileInput" style="display: none;" />
+        <input type="file" accept="image/*" @change="onFileChange" ref="fileInput" style="display: none" />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref } from 'vue'
+import axios from 'axios'
 
 export default defineComponent({
     name: 'ImageUpload',
-    setup() {
-        const fileInput = ref<HTMLInputElement | null>(null);
-        const imageSrc = ref<string | null>(null);
+    props: {
+        shortName: {
+            type: String,
+            required: true
+        }
+    },
+    setup(props) {
+        const fileInput = ref<HTMLInputElement | null>(null)
+        const imageSrc = ref<string | null>(null)
 
         const onDrop = (event: DragEvent) => {
-            event.preventDefault();
+            event.preventDefault()
             if (event.dataTransfer?.files) {
-                const file = event.dataTransfer.files[0];
+                const file = event.dataTransfer.files[0]
                 if (file && file.type.startsWith('image/')) {
-                    readFile(file);
+                    uploadFile(file)
                 }
             }
-        };
+        }
 
         const onFileChange = (event: Event) => {
-            const target = event.target as HTMLInputElement;
+            const target = event.target as HTMLInputElement
             if (target.files) {
-                const file = target.files[0];
+                const file = target.files[0]
                 if (file && file.type.startsWith('image/')) {
-                    readFile(file);
+                    uploadFile(file)
                 }
             }
-        };
+        }
 
-        const readFile = (file: File) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageSrc.value = e.target?.result as string;
-            };
-            reader.readAsDataURL(file);
-        };
+        const triggerFileInput = () => {
+            fileInput.value?.click()
+        }
+
+        const uploadFile = (file: File) => {
+            const formData = new FormData()
+            formData.append('image', file)
+
+            axios
+                .post(`/${props.shortName}/newThread`, formData)
+                .then((response) => {
+                    console.log('File uploaded successfully', response.data)
+                    const reader = new FileReader()
+                    reader.onload = (e) => {
+                        imageSrc.value = e.target?.result as string
+                    }
+                    reader.readAsDataURL(file)
+                })
+                .catch((error) => {
+                    console.error('Error uploading file', error)
+                })
+        }
 
         return {
             fileInput,
             imageSrc,
             onDrop,
-            onFileChange
-        };
+            onFileChange,
+            triggerFileInput
+        }
     }
-});
+})
 </script>
 
 <style scoped>

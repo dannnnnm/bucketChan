@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ResponsePanel from '@/components/ResponsePanel.vue';
+import ImageUpload from '@/components/ImageUpload.vue';
 </script>
 
 <template>
@@ -84,6 +85,11 @@ import ResponsePanel from '@/components/ResponsePanel.vue';
                 <v-col cols="12" :sm="3">
                     <input type="file" class="input-file btn-anistore" accept="image/png, image/jpeg, image/gif"
                         multiple="true" ref="imagePicker" v-on:change="loadFile($event)" id="uploadImages" />
+                </v-col>
+            </v-row>
+            <v-row justify="center">
+                <v-col cols="12" :sm="3">
+                    <ImageUpload shortName="boardDetails.shortName" />
                 </v-col>
             </v-row>
 

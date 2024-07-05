@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from 'axios';
+import axios from 'axios'
 </script>
 
 <template>
@@ -36,7 +36,6 @@ import axios from 'axios';
         </v-col>
       </v-row>
     </v-row>
-
   </v-container>
 </template>
 
@@ -46,34 +45,32 @@ export default {
     return {
       boards: [] as any[],
       boardsPerRow: 4,
-      totalRows: 0,
+      totalRows: 0
     }
   },
   mounted() {
-    axios.get(`http://${window.location.hostname}:3000/board/boards`, {
-      headers: {
-        "Content-Type": "application/json",
+    axios
+      .get(`http://${window.location.hostname}:3000/board/boards`, {
+        headers: {
+          'Content-Type': 'application/json'
 
-        //"Access-Control-Allow-Origin": "*",
-      }
-    }).then((response) => {
-      this.boards = response.data
-      this.totalRows = Math.ceil(this.boards.length / this.boardsPerRow);
-
-    })
-
-
+          //"Access-Control-Allow-Origin": "*",
+        }
+      })
+      .then((response) => {
+        this.boards = response.data
+        this.totalRows = Math.ceil(this.boards.length / this.boardsPerRow)
+      })
   },
   methods: {
     getRow(row: number) {
-      row--;
+      row--
       let lower = row * this.boardsPerRow
       let upper = lower + this.boardsPerRow
       upper = upper >= this.boards.length ? this.boards.length : upper
       //console.log("amount of articles ", this.articles.length)
       //console.log(`getting between ${lower} and ${upper}`)
       return this.boards.slice(lower, upper)
-
     }
   }
 }
